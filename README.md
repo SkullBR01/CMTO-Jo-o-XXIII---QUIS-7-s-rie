@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMTO João XXIII - QUIS 7º série</title>
+    <style>
+        :root {
+            --primary-color: #0c0c1d;
+            --secondary-color: #1a1a3a;
+            --accent-color: #00e5ff;
+            --accent-color-2: #ff00c8;
+            --text-color: #ffffff;
+            --correct-color: #00ff88;
+            --wrong-color: #ff3860;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 229, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 200, 0.1) 0%, transparent 20%);
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .author {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-color-2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background-color: var(--secondary-color);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-color-2));
+        }
+
+        .btn {
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-color-2));
+            color: var(--primary-color);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0, 229, 255, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 229, 255, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--accent-color);
+            color: var(--primary-color);
+        }
+
+        .subject-selection {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .subject-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .question-container {
+            display: none;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .question-number, .score {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: rgba(0, 229, 255, 0.2);
+            border-color: var(--accent-color);
+        }
+
+        .option.correct {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: var(--correct-color);
+        }
+
+        .option.wrong {
+            background: rgba(255, 56, 96, 0.2);
+            border-color: var(--wrong-color);
+        }
+
+        .option-letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .results-container {
+            display: none;
+            text-align: center;
+        }
+
+        .results-score {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 20px 0;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-color-2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .results-message {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-color-2));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(20px);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            
+            .author {
+                font-size: 1.5rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .subject-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <header>
+            <h1 class="author">Por: AL CMTO Davi Emanuel Espindola Oliveira</h1>
+            <p class="subtitle">Teste seus conhecimentos em Português e Matemática</p>
+        </header>
+        
+        <div class="card">
+            <!-- Tela de seleção de matéria -->
+            <div class="subject-selection" id="subjectSelection">
+                <h2>Escolha uma matéria</h2>
+                <div class="subject-buttons">
+                    <button class="btn" id="portugueseBtn">Português</button>
+                    <button class="btn" id="mathBtn">Matemática</button>
+                </div>
+            </div>
+            
+            <!-- Container da questão -->
+            <div class="question-container" id="questionContainer">
+                <div class="question-header">
+                    <div class="question-number" id="questionNumber">Questão 1/10</div>
+                    <div class="score" id="score">Pontuação: 0</div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+                
+                <div class="question-text" id="questionText"></div>
+                
+                <div class="options-container" id="optionsContainer"></div>
+                
+                <div class="navigation">
+                    <button class="btn btn-outline" id="prevBtn" disabled>Anterior</button>
+                    <button class="btn" id="nextBtn">Próxima</button>
+                </div>
+            </div>
+            
+            <!-- Tela de resultados -->
+            <div class="results-container" id="resultsContainer">
+                <h2>Quiz Concluído!</h2>
+                <div class="results-score" id="finalScore">0/10</div>
+                <div class="results-message" id="resultsMessage"></div>
+                <button class="btn" id="restartBtn">Jogar Novamente</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gerador de partículas
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Posição aleatória
+                particle.style.left = `${Math.random() * 100}%`;
+                
+                // Atraso aleatório na animação
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                
+                // Tamanho aleatório
+                const size = Math.random() * 3 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Cor aleatória entre os tons de azul e rosa
+                const hue = Math.random() > 0.5 ? 180 : 320;
+                particle.style.backgroundColor = `hsl(${hue}, 100%, 60%)`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Base de dados de questões
+        const questionsDatabase = {
+            portuguese: [
+                {
+                    question: "Qual das alternativas apresenta uma palavra oxítona?",
+                    options: ["café", "mesa", "livro", "casa"],
+                    correct: 0
+                },
+                {
+                    question: "Assinale a alternativa em que todas as palavras são acentuadas pela mesma regra:",
+                    options: ["saúde, pêssego, álbum", "órgão, bênção, português", "amável, férias, ciência", "herói, baú, país"],
+                    correct: 3
+                },
+                {
+                    question: "Qual das frases está correta quanto ao uso da crase?",
+                    options: ["Vou à escola.", "Ele chegou à tempo.", "Vamos à praia.", "Irei à festa."],
+                    correct: 0
+                },
+                {
+                    question: "Qual é o sujeito da frase: 'Os alunos estudaram para a prova.'?",
+                    options: ["estudaram", "para a prova", "Os alunos", "prova"],
+                    correct: 2
+                },
+                {
+                    question: "Assinale a alternativa em que há um erro de concordância verbal:",
+                    options: ["Faz dois anos que não os vejo.", "Houveram muitos problemas na reunião.", "Chegou ontem as encomendas.", "Vai haver festas no final de semana."],
+                    correct: 1
+                },
+                {
+                    question: "Qual das palavras é um exemplo de metáfora?",
+                    options: ["O tempo é ouro.", "Ele correu como um leão.", "A chuva caiu suavemente.", "O sol brilhou intensamente."],
+                    correct: 0
+                },
+                {
+                    question: "Qual é a função sintática da palavra 'rapidamente' na frase: 'Ele respondeu rapidamente à pergunta.'?",
+                    options: ["Sujeito", "Objeto direto", "Adjunto adverbial", "Predicativo"],
+                    correct: 2
+                },
+                {
+                    question: "Qual das alternativas apresenta apenas palavras paroxítonas?",
+                    options: ["árvore, fácil, tórax", "caderno, livro, mesa", "amável, útil, fóssil", "papel, caneta, lápis"],
+                    correct: 2
+                },
+                {
+                    question: "Qual é a classificação morfológica da palavra 'antes' na frase: 'Cheguei antes de você.'?",
+                    options: ["Advérbio", "Conjunção", "Preposição", "Substantivo"],
+                    correct: 0
+                },
+                {
+                    question: "Assinale a alternativa em que o uso do porquê está correto:",
+                    options: ["Não sei por que você fez isso.", "Por que você não veio?", "Ele não veio, por que estava doente.", "Quero saber o porquê de sua ausência."],
+                    correct: 3
+                }
+            ],
+            mathematics: [
+                {
+                    question: "Qual é o resultado da expressão: 5 + 3 × 2?",
+                    options: ["16", "11", "13", "10"],
+                    correct: 1
+                },
+                {
+                    question: "Se um triângulo tem lados medindo 3cm, 4cm e 5cm, ele é:",
+                    options: ["Equilátero", "Isósceles", "Escaleno", "Retângulo"],
+                    correct: 3
+                },
+                {
+                    question: "Qual é a raiz quadrada de 144?",
+                    options: ["11", "12", "13", "14"],
+                    correct: 1
+                },
+                {
+                    question: "Se 2x + 5 = 15, qual é o valor de x?",
+                    options: ["5", "10", "7", "8"],
+                    correct: 0
+                },
+                {
+                    question: "Qual é a área de um círculo com raio de 5cm? (use π = 3,14)",
+                    options: ["31,4 cm²", "78,5 cm²", "15,7 cm²", "62,8 cm²"],
+                    correct: 1
+                },
+                {
+                    question: "Qual é o MMC (Mínimo Múltiplo Comum) de 12 e 18?",
+                    options: ["24", "36", "48", "72"],
+                    correct: 1
+                },
+                {
+                    question: "Se um carro percorre 240 km com 20 litros de combustível, qual é o seu consumo em km/l?",
+                    options: ["10 km/l", "12 km/l", "14 km/l", "16 km/l"],
+                    correct: 1
+                },
+                {
+                    question: "Qual é o valor de 3² + 4²?",
+                    options: ["7", "12", "25", "49"],
+                    correct: 2
+                },
+                {
+                    question: "Qual é a medida do ângulo interno de um pentágono regular?",
+                    options: ["90°", "108°", "120°", "135°"],
+                    correct: 1
+                },
+                {
+                    question: "Se 30% de um número é 60, qual é esse número?",
+                    options: ["150", "180", "200", "220"],
+                    correct: 2
+                }
+            ]
+        };
+
+        // Variáveis do jogo
+        let currentSubject = '';
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = [];
+        let totalQuestions = 10; // Para demonstração, usando 10 questões
+
+        // Elementos DOM
+        const subjectSelection = document.getElementById('subjectSelection');
+        const questionContainer = document.getElementById('questionContainer');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const portugueseBtn = document.getElementById('portugueseBtn');
+        const mathBtn = document.getElementById('mathBtn');
+        const questionNumber = document.getElementById('questionNumber');
+        const scoreElement = document.getElementById('score');
+        const progress = document.getElementById('progress');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const finalScore = document.getElementById('finalScore');
+        const resultsMessage = document.getElementById('resultsMessage');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // Inicialização
+        function init() {
+            createParticles();
+            
+            // Event listeners
+            portugueseBtn.addEventListener('click', () => startQuiz('portuguese'));
+            mathBtn.addEventListener('click', () => startQuiz('mathematics'));
+            prevBtn.addEventListener('click', goToPreviousQuestion);
+            nextBtn.addEventListener('click', goToNextQuestion);
+            restartBtn.addEventListener('click', restartQuiz);
+        }
+
+        // Iniciar o quiz
+        function startQuiz(subject) {
+            currentSubject = subject;
+            currentQuestions = [...questionsDatabase[subject]];
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = new Array(currentQuestions.length).fill(null);
+            
+            // Embaralhar questões (para demonstração, usando apenas as 10 primeiras)
+            currentQuestions = shuffleArray(currentQuestions).slice(0, totalQuestions);
+            
+            // Mostrar container de questões e esconder seleção de matéria
+            subjectSelection.style.display = 'none';
+            questionContainer.style.display = 'block';
+            resultsContainer.style.display = 'none';
+            
+            // Carregar primeira questão
+            loadQuestion();
+        }
+
+        // Carregar questão atual
+        function loadQuestion() {
+            const question = currentQuestions[currentQuestionIndex];
+            
+            // Atualizar número da questão e pontuação
+            questionNumber.textContent = `Questão ${currentQuestionIndex + 1}/${totalQuestions}`;
+            scoreElement.textContent = `Pontuação: ${score}`;
+            
+            // Atualizar barra de progresso
+            progress.style.width = `${((currentQuestionIndex + 1) / totalQuestions) * 100}%`;
+            
+            // Definir texto da questão
+            questionText.textContent = question.question;
+            
+            // Limpar opções anteriores
+            optionsContainer.innerHTML = '';
+            
+            // Adicionar novas opções
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                
+                // Marcar se já foi respondida
+                if (userAnswers[currentQuestionIndex] === index) {
+                    optionElement.classList.add('selected');
+                    
+                    // Mostrar se está correta ou errada
+                    if (index === question.correct) {
+                        optionElement.classList.add('correct');
+                    } else {
+                        optionElement.classList.add('wrong');
+                    }
+                }
+                
+                optionElement.innerHTML = `
+                    <div class="option-letter">${optionLetters[index]}</div>
+                    <div class="option-text">${option}</div>
+                `;
+                
+                // Só permitir seleção se ainda não respondeu
+                if (userAnswers[currentQuestionIndex] === null) {
+                    optionElement.addEventListener('click', () => selectOption(index));
+                }
+                
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Atualizar estado dos botões de navegação
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            if (currentQuestionIndex === totalQuestions - 1) {
+                nextBtn.textContent = 'Finalizar';
+            } else {
+                nextBtn.textContent = 'Próxima';
+            }
+        }
+
+        // Selecionar uma opção
+        function selectOption(optionIndex) {
+            // Registrar resposta do usuário
+            userAnswers[currentQuestionIndex] = optionIndex;
+            
+            // Verificar se está correta
+            const question = currentQuestions[currentQuestionIndex];
+            if (optionIndex === question.correct) {
+                score++;
+            }
+            
+            // Recarregar a questão para mostrar o resultado
+            loadQuestion();
+        }
+
+        // Ir para a questão anterior
+        function goToPreviousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        // Ir para a próxima questão
+        function goToNextQuestion() {
+            if (currentQuestionIndex < totalQuestions - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                // Última questão - mostrar resultados
+                showResults();
+            }
+        }
+
+        // Mostrar resultados
+        function showResults() {
+            questionContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            
+            // Calcular pontuação final
+            finalScore.textContent = `${score}/${totalQuestions}`;
+            
+            // Mensagem personalizada baseada na pontuação
+            let message = '';
+            const percentage = (score / totalQuestions) * 100;
+            
+            if (percentage >= 90) {
+                message = 'Excelente! Você é um gênio!';
+            } else if (percentage >= 70) {
+                message = 'Muito bom! Você domina o assunto.';
+            } else if (percentage >= 50) {
+                message = 'Bom trabalho! Continue estudando.';
+            } else {
+                message = 'Não desanime! Pratique mais para melhorar.';
+            }
+            
+            resultsMessage.textContent = message;
+        }
+
+        // Reiniciar o quiz
+        function restartQuiz() {
+            subjectSelection.style.display = 'flex';
+            questionContainer.style.display = 'none';
+            resultsContainer.style.display = 'none';
+        }
+
+        // Função utilitária para embaralhar array
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Inicializar o jogo quando a página carregar
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
